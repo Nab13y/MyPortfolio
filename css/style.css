@@ -128,7 +128,7 @@ section {
 
 .home.show-animate .home-content .text-animate h3 {
     animation: homeBgText 4s linear infinite;
-    animation-delay: 0.5s;
+    animation-delay: 2s;
 }
 
 .home-content .text-animate h3::before {
@@ -144,7 +144,7 @@ section {
 
 .home.show-animate .home-content .text-animate h3::before {
     animation: homeCursorText 4s linear infinite;
-    animation-delay: 0.5s;
+    animation-delay: 2s;
 }
 
 .home-content p {
@@ -712,12 +712,12 @@ span {
 #menu-icon .animate,
 .home.show-animate .animate {
     animation: showRight 1s ease forwards;
-    animation-delay: calc(.1s * var(--i));
+    animation-delay: calc(.3s * var(--i));
 } 
 
 .animate.scroll {
     transition: 1s ease;
-    transition-delay: calc(.1s / var(--i));
+    transition-delay: calc(.3s / var(--i));
     animation: none ;
 }
 
@@ -735,7 +735,7 @@ section:nth-child(odd) .animate.scroll,
 .skills.show-animate .animate.scroll,
 .contact.show-animate .animate.scroll,
 .footer.show-animate .animate.scroll {
-    transition-delay: calc(.1s * var(--i));
+    transition-delay: calc(.3s * var(--i));
     width: 0;
 }
 
