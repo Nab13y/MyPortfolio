@@ -286,7 +286,7 @@
             <div class="preview-box">
                 <div class="preview-section">
                     <h4>Professional Summary</h4>
-                    <p>Ethical hacker with BCA background, specialized in penetration testing, vulnerability assessment, and cybersecurity solutions. Passionate about securing digital landscapes through responsible and transparent practices.</p>
+                    <p>Ethical hacker with BCA background, specialized in penetration testing, vulnerability assessment, and cybersecurity solutions. Passionate about securing digital landscapes throu[...]
                 </div>
 
                 <div class="preview-section">
@@ -482,11 +482,28 @@
     });
 
     // Load resume on page load
+    // URL of the resume file in the repo
+    const repoResumeUrl = 'https://raw.githubusercontent.com/Nab13y/MyPortfolio/main/resume/NobinKrBairagiResume.pdf';
+    
     window.addEventListener('load', () => {
         const storedResume = localStorage.getItem('resumeData');
         if (storedResume) {
             const fileData = JSON.parse(storedResume);
             displayResumeInfo(fileData);
+        } else {
+            // Show repo resume as default
+            resumeInfo.innerHTML = `
+                <div class="file-info">
+                    <i class='bx bxs-file-pdf'></i>
+                    <div>
+                        <p><strong>NobinKrBairagiResume.pdf</strong></p>
+                        <small>PDF • from repository</small>
+                    </div>
+                </div>
+            `;
+            resumeActions.style.display = 'flex';
+            downloadBtn.href = repoResumeUrl;
+            downloadBtn.download = 'NobinKrBairagiResume.pdf';
         }
     });
 </script>
