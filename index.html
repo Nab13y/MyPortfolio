@@ -250,17 +250,39 @@
     <h2 class="heading">My <span>Resume</span><span class="animate scroll" style="--i:1;"></span></h2>
 
     <div class="resume-container">
-        <div class="resume-content">
-            <h3>Download Resume<span class="animate scroll" style="--i:2;"></span></h3>
-            <p>Get a detailed overview of my professional background, skills, and accomplishments.<span class="animate scroll" style="--i:3;"></span></p>
-            
-            <div class="btn-box btns">
-                <a href="#" class="btn" download>Download PDF<span class="animate scroll" style="--i:4;"></span></a>
+        <!-- Resume Upload Section -->
+        <div class="resume-upload-section">
+            <h3>Upload Your Resume<span class="animate scroll" style="--i:2;"></span></h3>
+            <div class="upload-box">
+                <div class="upload-icon">
+                    <i class='bx bx-cloud-upload'></i>
+                </div>
+                <input type="file" id="resumeFile" accept=".pdf,.doc,.docx" style="display: none;">
+                <p>Drag and drop your resume or <label for="resumeFile" class="upload-link">click to upload</label></p>
+                <small>Supported formats: PDF, DOC, DOCX (Max 5MB)</small>
+                <div id="uploadStatus" class="upload-status"></div>
+                <span class="animate scroll" style="--i:3;"></span>
             </div>
         </div>
 
-        <div class="resume-preview">
-            <h3>Resume Preview<span class="animate scroll" style="--i:5;"></span></h3>
+        <!-- Resume Display Section -->
+        <div class="resume-display-section">
+            <h3>Current Resume<span class="animate scroll" style="--i:4;"></span></h3>
+            <div class="resume-info">
+                <div id="resumeInfo" class="resume-info-content">
+                    <p class="no-resume">No resume uploaded yet</p>
+                </div>
+                <div id="resumeActions" class="resume-actions" style="display: none;">
+                    <a id="downloadBtn" href="#" class="btn" download>Download Resume</a>
+                    <button id="removeBtn" class="btn btn-danger">Remove Resume</button>
+                    <span class="animate scroll" style="--i:5;"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resume Preview Section -->
+        <div class="resume-preview-section">
+            <h3>Resume Preview<span class="animate scroll" style="--i:6;"></span></h3>
             <div class="preview-box">
                 <div class="preview-section">
                     <h4>Professional Summary</h4>
@@ -283,7 +305,7 @@
                     <p>Add your certifications here - they will be displayed when you update this section.</p>
                 </div>
 
-                <span class="animate scroll" style="--i:6;"></span>
+                <span class="animate scroll" style="--i:7;"></span>
             </div>
         </div>
     </div>
@@ -348,5 +370,125 @@
 </footer>
 
 <script src="js/script.js"></script>
+<script>
+    // Resume Upload Functionality
+    const resumeFile = document.getElementById('resumeFile');
+    const uploadBox = document.querySelector('.upload-box');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const resumeInfo = document.getElementById('resumeInfo');
+    const resumeActions = document.getElementById('resumeActions');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const removeBtn = document.getElementById('removeBtn');
+
+    // Handle file selection
+    resumeFile.addEventListener('change', handleFileUpload);
+
+    // Drag and drop functionality
+    uploadBox.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadBox.style.borderColor = '#00d4ff';
+        uploadBox.style.backgroundColor = 'rgba(0, 212, 255, 0.1)';
+    });
+
+    uploadBox.addEventListener('dragleave', () => {
+        uploadBox.style.borderColor = '#00d4ff';
+        uploadBox.style.backgroundColor = 'transparent';
+    });
+
+    uploadBox.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadBox.style.borderColor = '#00d4ff';
+        uploadBox.style.backgroundColor = 'transparent';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            resumeFile.files = files;
+            handleFileUpload({ target: { files } });
+        }
+    });
+
+    function handleFileUpload(e) {
+        const files = e.target.files;
+        if (files.length === 0) return;
+
+        const file = files[0];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+
+        // Validate file type
+        const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!validTypes.includes(file.type)) {
+            showStatus('Please upload a PDF or Word document.', 'error');
+            return;
+        }
+
+        // Validate file size
+        if (file.size > maxSize) {
+            showStatus('File size exceeds 5MB limit.', 'error');
+            return;
+        }
+
+        // Convert file to base64 and store in localStorage
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const fileData = {
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                data: event.target.result
+            };
+
+            localStorage.setItem('resumeData', JSON.stringify(fileData));
+            showStatus('Resume uploaded successfully!', 'success');
+            displayResumeInfo(fileData);
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    function displayResumeInfo(fileData) {
+        const fileSize = (fileData.size / 1024).toFixed(2);
+        const fileType = fileData.type.includes('pdf') ? 'PDF' : 'Word Document';
+        
+        resumeInfo.innerHTML = `
+            <div class="file-info">
+                <i class='bx bxs-file-pdf'></i>
+                <div>
+                    <p><strong>${fileData.name}</strong></p>
+                    <small>${fileType} • ${fileSize} KB</small>
+                </div>
+            </div>
+        `;
+        
+        resumeActions.style.display = 'flex';
+        downloadBtn.href = fileData.data;
+        downloadBtn.download = fileData.name;
+    }
+
+    function showStatus(message, type) {
+        uploadStatus.textContent = message;
+        uploadStatus.className = `upload-status ${type}`;
+        setTimeout(() => {
+            uploadStatus.textContent = '';
+            uploadStatus.className = 'upload-status';
+        }, 3000);
+    }
+
+    removeBtn.addEventListener('click', () => {
+        localStorage.removeItem('resumeData');
+        resumeInfo.innerHTML = '<p class="no-resume">No resume uploaded yet</p>';
+        resumeActions.style.display = 'none';
+        uploadStatus.textContent = '';
+        showStatus('Resume removed successfully!', 'success');
+    });
+
+    // Load resume on page load
+    window.addEventListener('load', () => {
+        const storedResume = localStorage.getItem('resumeData');
+        if (storedResume) {
+            const fileData = JSON.parse(storedResume);
+            displayResumeInfo(fileData);
+        }
+    });
+</script>
 </body>
 </html>
